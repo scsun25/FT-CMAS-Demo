@@ -1,59 +1,56 @@
-import 'primereact/resources/themes/lara-light-blue/theme.css';
-import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
+import 'primereact/resources/primereact.min.css';
+import 'primereact/resources/themes/lara-light-blue/theme.css';
 import { useState } from 'react';
+
+import { useAuth } from './context/AuthContext';
+import { handleAuth, handleGoogleSignUp } from './features/auth/firebaseAuthHandlers';
 import { auth } from './firebase';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [greet, setGreet] = useState('');
-  const [error, setError] = useState('');
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail]: [string, React.Dispatch<React.SetStateAction<string>>] =
+    useState<string>('');
+  const [password, setPassword]: [string, React.Dispatch<React.SetStateAction<string>>] =
+    useState<string>('');
+  const [showPassword, setShowPassword]: [boolean, React.Dispatch<React.SetStateAction<boolean>>] =
+    useState<boolean>(false);
+  const [greet, setGreet]: [string, React.Dispatch<React.SetStateAction<string>>] =
+    useState<string>('');
+  const [error, setError]: [string, React.Dispatch<React.SetStateAction<string>>] =
+    useState<string>('');
+  const [mode, setMode]: [
+    'signin' | 'signup',
+    React.Dispatch<React.SetStateAction<'signin' | 'signup'>>,
+  ] = useState<'signin' | 'signup'>('signin');
+  const { user, setUser } = useAuth();
 
-  const handleAuth = async () => {
-    setError('');
-    setGreet('');
-    try {
-      if (mode === 'signin') {
-        await signInWithEmailAndPassword(auth, email, password);
-        setGreet(`Welcome back to CMAS Project${email ? ', ' + email : ''}!`);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-        setGreet(`Account created! Welcome to CMAS Project${email ? ', ' + email : ''}!`);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
-    }
-  };
-
-  const handleGoogleSignUp = async () => {
-    setError('');
-    setGreet('');
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      setGreet(`Welcome to CMAS Project, ${user.displayName || user.email}!`);
-    } catch (err: any) {
-      setError(err.message || 'Google Sign-Up failed');
-    }
-  };
+  if (user) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center h-screen w-screen bg-gradient-to-br from-blue-100 to-blue-300">
+        <Card className="max-w-md min-w-[300px] w-full mx-auto p-6 shadow-2xl border border-gray-200 rounded-xl">
+          <div className="flex flex-col items-center">
+            <h2 className="text-2xl font-semibold text-gray-800">
+              Welcome, {user.displayName || user.email}!
+            </h2>
+            <Button
+              label="Sign Out"
+              icon="pi pi-sign-out"
+              onClick={() => auth.signOut()}
+              className="w-full p-button-secondary mt-8"
+            />
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-300">
-      <Card className="w-1/4 min-w-[300px] max-w-md p-6 shadow-2xl border border-gray-200 rounded-xl mb-8">
+    <div className="fixed inset-0 flex items-center justify-center h-screen w-screen bg-gradient-to-br from-blue-100 to-blue-300">
+      <Card className="max-w-md min-w-[300px] mx-auto p-6 shadow-2xl border border-gray-200 rounded-xl">
         <div className="flex flex-col items-center">
           <h2 className="text-2xl font-semibold text-gray-800">{'Welcome to CMAS'}</h2>
           <div className="w-full flex flex-col gap-4 mb-8">
@@ -89,7 +86,7 @@ function App() {
             label={mode === 'signin' ? 'Sign In' : 'Sign Up'}
             icon={mode === 'signin' ? 'pi pi-sign-in' : 'pi pi-user-plus'}
             iconPos="right"
-            onClick={handleAuth}
+            onClick={() => handleAuth(mode, email, password, setGreet, setError)}
             className="w-full p-button-primary mt-2 mb-8"
           />
 
@@ -98,9 +95,8 @@ function App() {
             label="Sign in with Google"
             icon="pi pi-google"
             iconPos="left"
-            onClick={handleGoogleSignUp}
+            onClick={() => handleGoogleSignUp(setGreet, setError)}
             className="w-full p-button-secondary mt-2 mb-8"
-            // style={{ visibility: mode === 'signin' ? 'hidden' : '' }}
           />
 
           <div className="w-full flex flex-col" style={{ marginBottom: '1rem' }}></div>
