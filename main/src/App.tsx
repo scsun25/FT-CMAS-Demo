@@ -1,17 +1,13 @@
-import 'primeicons/primeicons.css';
 import { Button } from 'primereact/button';
 import { Card } from 'primereact/card';
 import { InputText } from 'primereact/inputtext';
 import { Password } from 'primereact/password';
-import 'primereact/resources/primereact.min.css';
-import 'primereact/resources/themes/lara-light-blue/theme.css';
 import { useState } from 'react';
-
 import { useAuth } from './context/AuthContext';
+import { auth } from './features/auth/firebase';
 import { handleAuth, handleGoogleSignUp } from './features/auth/firebaseAuthHandlers';
-import { auth } from './firebase';
 
-function App() {
+const App = () => {
   const [email, setEmail]: [string, React.Dispatch<React.SetStateAction<string>>] =
     useState<string>('');
   const [password, setPassword]: [string, React.Dispatch<React.SetStateAction<string>>] =
@@ -31,7 +27,7 @@ function App() {
   if (user) {
     return (
       <div className="fixed inset-0 flex items-center justify-center h-screen w-screen bg-gradient-to-br from-blue-100 to-blue-300">
-        <Card className="max-w-md min-w-[300px] w-full mx-auto p-6 shadow-2xl border border-gray-200 rounded-xl">
+        <Card className="max-w-md min-w-[300px]mx-auto p-6 shadow-2xl border border-gray-200 rounded-xl">
           <div className="flex flex-col items-center">
             <h2 className="text-2xl font-semibold text-gray-800">
               Welcome, {user.displayName || user.email}!
@@ -83,6 +79,7 @@ function App() {
           <div className="w-full flex flex-col" style={{ marginBottom: '1rem' }}></div>
 
           <Button
+            severity="primary"
             label={mode === 'signin' ? 'Sign In' : 'Sign Up'}
             icon={mode === 'signin' ? 'pi pi-sign-in' : 'pi pi-user-plus'}
             iconPos="right"
@@ -119,6 +116,6 @@ function App() {
       </Card>
     </div>
   );
-}
+};
 
 export default App;

@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { auth } from './firebase';
 
 import type { User as FirebaseUser, UserCredential } from 'firebase/auth';
 
