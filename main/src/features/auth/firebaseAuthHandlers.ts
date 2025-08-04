@@ -25,6 +25,7 @@ export const handleAuth: (
 ) => Promise<void> = async (mode, email, password, setGreet, setError, setUser) => {
   setError('');
   setGreet('');
+  let result: UserCredential;
   try {
     if (mode === 'signin') {
       result = await signInWithEmailAndPassword(auth, email, password);
@@ -33,7 +34,11 @@ export const handleAuth: (
       result = await createUserWithEmailAndPassword(auth, email, password);
       setGreet(`Account created! Welcome to CMAS Project${email ? ', ' + email : ''}!`);
     }
-    updateAuthContext(setUser, result.user);
+    if (result.user) {
+      updateAuthContext(setUser, result.user);
+    } else {
+      throw new Error('User not found after authentication'); // Handle case where user is null
+    }
   } catch (err: any) {
     setError(err.message || 'Authentication failed');
   }

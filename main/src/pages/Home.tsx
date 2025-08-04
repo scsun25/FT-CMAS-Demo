@@ -1,5 +1,5 @@
 import type { User } from 'firebase/auth';
-import { Menubar } from 'primereact/menubar';
+import { useNavigate } from 'react-router-dom';
 
 const menuItems = [
   { label: 'Home', icon: 'pi pi-fw pi-home' },
@@ -11,16 +11,19 @@ type HomePageLayoutProps = {
   currentUser: User | null; // Adjust the type as needed
 };
 
-const HomePageLayout: React.FC<HomePageLayoutProps> = ({ currentUser }) => {
-  return (
-    <div className="min-h-screen w-full flex flex-col bg-gradient-to-br from-blue-100 to-blue-300">
-      <Menubar model={menuItems} className="!rounded-none" />
+const HomePage: React.FC<HomePageLayoutProps> = ({ currentUser }) => {
+  const navigate = useNavigate();
 
-      <h1 className="text-4xl font-bold text-gray-800">
-        {'Welcome to the Home Page ' + JSON.stringify(currentUser?.displayName)}
+  return (
+    <div className="w-full flex flex-col bg-gradient-to-br from-blue-100 to-blue-300">
+      <h1>This is home page for Ads</h1>
+      <h1>
+        {currentUser
+          ? `Welcome, ${currentUser.displayName || currentUser.email || 'User'}!`
+          : 'Not signed in'}
       </h1>
     </div>
   );
 };
 
-export default HomePageLayout;
+export default HomePage;
